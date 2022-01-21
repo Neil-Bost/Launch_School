@@ -1,246 +1,147 @@
-def prompt(message)
-  puts "#{message}"
-end
+# cd Launch_School/Ruby/Back_End/RB101/Lesson_6
 
-FRESH_DECK = {
-  hearts: { 
-  "2 of hearts" => 2,
-  "3 of hearts" => 3,
-  "4 of hearts" => 4,
-  "5 of hearts" => 5,
-  "6 of hearts" => 6,
-  "7 of hearts" => 7,
-  "8 of hearts" => 8,
-  "9 of hearts" => 9,
-  "10 of hearts" => 10,
-  "Jack of hearts" => 10,
-  "Queen of hearts" => 10,
-  "King of hearts" => 10,
-  "Ace of hearts" => 1
-  },
-  diamonds: {
-    "2 of diamonds" => 2,
-    "3 of diamonds" => 3,
-    "4 of diamonds" => 4,
-    "5 of diamonds" => 5,
-    "6 of diamonds" => 6,
-    "7 of diamonds" => 7,
-    "8 of diamonds" => 8,
-    "9 of diamonds" => 9,
-    "10 of diamonds" => 10,
-    "Jack of diamonds" => 10,
-    "Queen of diamonds" => 10,
-    "King of diamonds" => 10,
-    "Ace of diamonds" => 1
-  },
-  clubs: {
-    "2 of clubs" => 2,
-    "3 of clubs" => 3,
-    "4 of clubs" => 4,
-    "5 of clubs" => 5,
-    "6 of clubs" => 6,
-    "7 of clubs" => 7,
-    "8 of clubs" => 8,
-    "9 of clubs" => 9,
-    "10 of clubs" => 10,
-    "Jack of clubs" => 10,
-    "Queen of clubs" => 10,
-    "King of clubs" => 10,
-    "Ace of clubs" => 1
-  },
-  spades: {
-    "2 of spades" => 2,
-    "3 of spades" => 3,
-    "4 of spades" => 4,
-    "5 of spades" => 5,
-    "6 of spades" => 6,
-    "7 of spades" => 7,
-    "8 of spades" => 8,
-    "9 of spades" => 9,
-    "10 of spades" => 10,
-    "Jack of spades" => 10,
-    "Queen of spades" => 10,
-    "King of spades" => 10,
-    "Ace of spades" => 1
-  }
-}
+require 'pry'
+require 'pry-byebug'
+
+SUITS = [" of hearts", " of diamonds", " of clubs", " of spades"]
+VALUES = %w(2 3 4 5 6 7 8 9 10 Jack Queen King Ace)
+
+def prompt(message)
+  puts "=> #{message}"
+end
 
 def initialize_deck
-  new_deck = {
-    hearts: { 
-      "2 of hearts" => 2,
-      "3 of hearts" => 3,
-      "4 of hearts" => 4,
-      "5 of hearts" => 5,
-      "6 of hearts" => 6,
-      "7 of hearts" => 7,
-      "8 of hearts" => 8,
-      "9 of hearts" => 9,
-      "10 of hearts" => 10,
-      "Jack of hearts" => 10,
-      "Queen of hearts" => 10,
-      "King of hearts" => 10,
-      "Ace of hearts" => 1
-    },
-    diamonds: {
-      "2 of diamonds" => 2,
-      "3 of diamonds" => 3,
-      "4 of diamonds" => 4,
-      "5 of diamonds" => 5,
-      "6 of diamonds" => 6,
-      "7 of diamonds" => 7,
-      "8 of diamonds" => 8,
-      "9 of diamonds" => 9,
-      "10 of diamonds" => 10,
-      "Jack of diamonds" => 10,
-      "Queen of diamonds" => 10,
-      "King of diamonds" => 10,
-      "Ace of diamonds" => 1
-  },
-    clubs: {
-      "2 of clubs" => 2,
-      "3 of clubs" => 3,
-      "4 of clubs" => 4,
-      "5 of clubs" => 5,
-      "6 of clubs" => 6,
-      "7 of clubs" => 7,
-      "8 of clubs" => 8,
-      "9 of clubs" => 9,
-      "10 of clubs" => 10,
-      "Jack of clubs" => 10,
-      "Queen of clubs" => 10,
-      "King of clubs" => 10,
-      "Ace of clubs" => 1
-    },
-    spades: {
-      "2 of spades" => 2,
-      "3 of spades" => 3,
-      "4 of spades" => 4,
-      "5 of spades" => 5,
-      "6 of spades" => 6,
-      "7 of spades" => 7,
-      "8 of spades" => 8,
-      "9 of spades" => 9,
-      "10 of spades" => 10,
-      "Jack of spades" => 10,
-      "Queen of spades" => 10,
-      "King of spades" => 10,
-      "Ace of spades" => 1
-    }
-  }
+  new_deck = []
+  VALUES.product(SUITS) { |num_and_suit| new_deck << num_and_suit.join }
+  new_deck.shuffle
 end
 
-def deal_card!(dck)
-  suit = dck.keys.sample
-  card = dck[suit].keys.sample
-  dck[suit].delete(card)
-  card
-end
-
-def card_value(card)
-  value = nil
-  FRESH_DECK.each do |suit, cards|
-    value = cards[card] if cards[card]
+def total(hand)
+  sum = 0
+  hand.each do |card|
+    if card[0] == "A" # Aces
+      sum += 11
+    elsif card[0] == "1" || card[0].to_i == 0 # 10s, Jacks, Queens, Kings
+      sum += 10
+    else # Any 2-9 cards
+      sum += card[0].to_i
+    end
   end
-  value
+  ### Revalue Aces if sum > 21
+  hand.each { |card| sum -= 10 if card[0] == "A" && sum > 21 } if sum > 21
+  sum
+end
+
+def compare_results(player, dealer)
+  prompt "Your total is #{player}"
+  prompt "The dealer's total is #{dealer}"
+
+  if player > dealer
+    prompt "Congratulations! You win!"
+  else
+    prompt "Dealer wins!"
+  end
 end
 
 prompt "Welcome to Twenty-One! Let's begin."
-deck = initialize_deck
-
-player_cards = {}
-dealer_cards = {}
 
 loop do
+  deck = initialize_deck
+  player_cards = []
+  dealer_cards = []
+
   loop do
-    player_cards[1] = deal_card!(deck)
-    player_cards[2] = deal_card!(deck)
-    
-    dealer_cards[1] = deal_card!(deck)
-    dealer_cards[2] = deal_card!(deck)
-    
-    prompt "The dealer has the following two cards:
-    #{dealer_cards[1]}
-    unknown card"
+    player_cards << deck.shift
+    player_cards << deck.shift
+
+    dealer_cards << deck.shift
+    dealer_cards << deck.shift
+
+    prompt "The dealer has the following two cards:"
+    puts dealer_cards[0]
+    puts "unknown card"
     puts
-    
-    prompt "You are delt the following two cards:
-    #{player_cards[1]}
-    #{player_cards[2]}"
-    puts
-  
-    player_total = card_value(player_cards[1]) + card_value(player_cards[2])
-    dealer_total = card_value(dealer_cards[1]) + card_value(dealer_cards[2])
-  
+    dealer_total = total(dealer_cards)
+
+    prompt "You are delt the following two cards:"
+    puts player_cards
+
+    player_total = total(player_cards)
+    prompt "Your total is #{player_total}"
+
+    ### Player Loop
     loop do
       hit_or_stay = nil
-      increment = 3
       loop do
+        puts
         prompt "Would you like to hit or stay?"
         hit_or_stay = gets.chomp.downcase
+        puts
         break if hit_or_stay == "hit" || hit_or_stay == "stay"
         prompt "Not a valid option."
       end
-      
+
       if hit_or_stay == 'hit'
-        prompt "#{player_cards[increment] = deal_card!(deck)}"
-        player_total += card_value(player_cards[increment])
-        increment += 1
+        player_cards << deck.shift
+        puts player_cards
+
+        player_total = total(player_cards)
+        prompt "Your total is #{player_total}"
+
         if player_total > 21
-          prompt "Bust! Too bad!"
+          prompt "Bust! Dealer wins!"
           break
         end
-      else
+      else # player chose "stay"
         break
       end
     end
-    
-    break if player_total > 21
-    
-    prompt "The dealer has the following two cards:
-    #{dealer_cards[1]}
-    #{dealer_cards[2]}"
+
+    player_total = total(player_cards)
+    break if player_total > 21 # skips dealer turn if player busted
+
+    prompt "The dealer has the following two cards:"
+    puts dealer_cards
+    prompt "The dealers total is #{dealer_total}"
     puts
-    
-    i = 3
+
+    ### Dealer Loop
     loop do
       if dealer_total < 17
         prompt "The dealer hits:"
-        prompt dealer_cards[i] = deal_card!(deck)
-        dealer_total += card_value(dealer_cards[i])
-        i += 1
+        dealer_cards << deck.shift
+        puts dealer_cards
+        dealer_total = total(dealer_cards)
+        prompt "Dealer's total is #{dealer_total}"
+        puts
       elsif dealer_total >= 17 && dealer_total <= 21
-        prompt "The dealer's total is #{dealer_total}"
         prompt "The dealer stays."
+        puts
         break
-      else
-        prompt "The dealer's total is #{dealer_total}"
+      else # dealer's total > 21
         prompt "The dealer busts!"
+        prompt "You win!"
         break
       end
     end
-    
+
+    dealer_total = total(dealer_cards)
     break if dealer_total > 21
-    
-    prompt "Your total is: #{player_total}"
-    prompt "The dealer's total is: #{dealer_total}"
-    if player_total > dealer_total
-      prompt "Congratulations! You win!"
-      break
-    else
-      prompt "Dealer wins!"
-      break
-    end
+
+    compare_results(player_total, dealer_total)
+    break
   end
-    again = nil
-    loop do
-      prompt "Would you like to play again? (y/n)"
-      again = gets.chomp
-      break if again == 'n' || again == 'y'
-      prompt "Invalid input."
-    end
-    
-    break if again == 'n'
+
+  again = nil
+  loop do
+    prompt "Would you like to play again? (y/n)"
+    again = gets.chomp
+    break if again == 'n' || again == 'y'
+    prompt "Invalid input."
+  end
+
+  break if again == 'n'
+  system 'clear'
 end
 
 prompt "Thanks for playing Twenty-One! See ya!"
